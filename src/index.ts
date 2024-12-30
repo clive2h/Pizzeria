@@ -29,7 +29,7 @@ export const client = new Client({
     GatewayIntentBits.GuildPresences,
     GatewayIntentBits.GuildWebhooks,
   ],
-  partials: [Partials.Channel] // Needed to handle partial DM channels
+  partials: [Partials.Channel]
 });
 
 const event = require('./events/voicemuteEvent');
