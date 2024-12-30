@@ -7,10 +7,8 @@ export const execute = async (message: Message, args: string[]) => {
     return message.reply("Please provide a new name or a link to the new avatar.");
   }
 
-  // Check if the first argument is a URL for an image (used to change avatar)
   const avatarUrlRegex = /^https?:\/\/(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+$/;
   
-  // If the first argument is a URL, try to set it as the avatar
   if (avatarUrlRegex.test(args[0])) {
     try {
       await message.client.user?.setAvatar(args[0]);
@@ -20,8 +18,7 @@ export const execute = async (message: Message, args: string[]) => {
       message.reply("There was an error changing the bot's avatar.");
     }
   } else {
-    // If the first argument is not a URL, treat it as the new bot name
-    const newName = args.join(" ");  // Join multiple words if the new name contains spaces
+    const newName = args.join(" ");  
     try {
       await message.client.user?.setUsername(newName);
       message.reply(`Bot's username has been changed to ${newName}`);
