@@ -8,7 +8,7 @@ export function loadEvents(client: Client) {
 
   for (const file of eventFiles) {
     const event = require(path.join(eventsPath, file));
-    const eventName = file.split('.')[0]; // Use the file name as the event name
+    const eventName = file.split('.')[0]; 
 
     if (event.once) {
       client.once(eventName, (...args) => event.execute(...args, client));
