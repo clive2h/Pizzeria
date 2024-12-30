@@ -112,24 +112,23 @@ export const execute = async (message: Message): Promise<void> => {
                 const reason = interaction.values[0];
                 switch (reason) {
                     case 'spamming':
-                        muteDuration = 15 * 60; // 15 minutes
+                        muteDuration = 15 * 60; 
                         break;
                     case 'bad_words':
-                        muteDuration = 1 * 60 * 60; // 1 hour
+                        muteDuration = 1 * 60 * 60;
                         break;
                     case 'being_jerk':
-                        muteDuration = 2 * 60 * 60; // 2 hours
+                        muteDuration = 2 * 60 * 60;
                         break;
                     case 'bothering':
-                        muteDuration = 3 * 60 * 60; // 3 hours
+                        muteDuration = 3 * 60 * 60;
                         break;
                     default:
-                        muteDuration = 30 * 60; // Default mute duration (30 minutes)
+                        muteDuration = 30 * 60; 
                         break;
                         case 'different-reason': {
                             const channel = interaction.channel;
                         
-                            // Ensure the channel is a valid TextChannel or DMChannel that supports collectors
                             if (!channel || (channel.type !== ChannelType.GuildText && channel.type !== ChannelType.DM)) {
                                 await interaction.reply({
                                     content: 'Cannot collect custom duration in this type of channel.',
@@ -151,7 +150,7 @@ export const execute = async (message: Message): Promise<void> => {
                         
                             durationCollector.on('collect', async (msg) => {
                                 const input = msg.content.trim();
-                                const durationRegex = /(\d+)([smh])/i; // Matches duration with unit (e.g., 10m, 2h, 30s)
+                                const durationRegex = /(\d+)([smh])/i;
                                 const match = durationRegex.exec(input);
                         
                                 if (!match) {
@@ -159,7 +158,7 @@ export const execute = async (message: Message): Promise<void> => {
                                     return;
                                 }
                         
-                                const reason = input.replace(durationRegex, '').trim(); // Extract reason from input
+                                const reason = input.replace(durationRegex, '').trim();
                                 const durationValue = parseInt(match[1], 10);
                                 const durationUnit = match[2].toLowerCase();
                         
@@ -168,7 +167,6 @@ export const execute = async (message: Message): Promise<void> => {
                                     return;
                                 }
                         
-                                // Calculate mute duration in seconds
                                 switch (durationUnit) {
                                     case 's':
                                         muteDuration = durationValue;
@@ -180,7 +178,7 @@ export const execute = async (message: Message): Promise<void> => {
                                         muteDuration = durationValue * 60 * 60;
                                         break;
                                     default:
-                                        muteDuration = 30 * 60; // Default to 30 minutes
+                                        muteDuration = 30 * 60;
                                         break;
                                 }
                         
@@ -203,10 +201,8 @@ export const execute = async (message: Message): Promise<void> => {
                         
                 }
         
-                // Delete the select menu
                 await interaction.message.delete();
         
-                // Apply mute and log data
                 await applyMute(target, reason, message, muteDuration, mutedRole);
                 await logMuteData(message.guild?.id!, target.id, muteDuration, reason, message.author.id, mutedRole);
             } catch (err) {
@@ -256,8 +252,8 @@ const logMuteData = async (guildId: string, userId: string, muteDuration: number
     }
 
     const currentDate = new Date();
-    const date = `${currentDate.getDate()}/${currentDate.getMonth() + 1}/${currentDate.getFullYear()}`;  // Format: DD/MM/YYYY
-    const time = `${currentDate.getHours()}:${currentDate.getMinutes()}:${currentDate.getSeconds()}`;  // Format: HH:MM:SS
+    const date = `${currentDate.getDate()}/${currentDate.getMonth() + 1}/${currentDate.getFullYear()}`; 
+    const time = `${currentDate.getHours()}:${currentDate.getMinutes()}:${currentDate.getSeconds()}`; 
 
     const muteData = {
         guildId: guildId,        // Guild ID
@@ -266,7 +262,7 @@ const logMuteData = async (guildId: string, userId: string, muteDuration: number
         roleId: mutedRole.id,    // roleId is now passed correctly
         date: date,              // Date when muted
         time: time,              // Time when muted
-        duration: readableDuration, // Human-readable durationf
+        duration: readableDuration, // Readable durationf
         reason: reason,
         expired: null
     };
