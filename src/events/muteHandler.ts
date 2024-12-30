@@ -15,11 +15,11 @@ function parseDuration(duration: string): number {
     const value = parseInt(match[1], 10);
     const unit = match[2];
     if (unit === 'h') {
-      totalMilliseconds += value * 60 * 60 * 1000; // hours to milliseconds
+      totalMilliseconds += value * 60 * 60 * 1000; 
     } else if (unit === 'm') {
-      totalMilliseconds += value * 60 * 1000; // minutes to milliseconds
+      totalMilliseconds += value * 60 * 1000;
     } else if (unit === 's') {
-      totalMilliseconds += value * 1000; // seconds to milliseconds
+      totalMilliseconds += value * 1000;
     }
   }
   return totalMilliseconds;
@@ -31,7 +31,6 @@ async function unmuteUser(client: Client) {
     const muteData: any[] = JSON.parse(data);
 
     for (const mute of muteData) {
-      // Skip already expired mutes
       if (mute.expired) {
     //    console.log(`Skipping expired mute for user ${mute.userId} in guild ${mute.guildId}`);
         continue;
@@ -55,7 +54,6 @@ async function unmuteUser(client: Client) {
           //  console.log(`Could not find member or mute role in guild ${guild.name}`);
           }
 
-          // Mark the mute entry as expired
           mute.expired = true;
         } catch (err) {
           console.error('Error unmuting user:', err);
@@ -63,7 +61,6 @@ async function unmuteUser(client: Client) {
       }
     }
 
-    // Save the updated mute data back to the file
     await fs.promises.writeFile(muteDataFilePath, JSON.stringify(muteData, null, 2));
 
   } catch (err) {
