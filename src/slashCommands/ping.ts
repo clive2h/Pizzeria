@@ -1,7 +1,6 @@
 import { SlashCommandBuilder } from 'discord.js';
 import { CommandInteraction, Message } from 'discord.js';
 
-// Define the slash command
 export const data = new SlashCommandBuilder()
     .setName('ping')
     .setDescription('Replies with Pong! and latency information.');
