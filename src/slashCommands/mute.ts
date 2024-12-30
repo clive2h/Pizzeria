@@ -13,7 +13,6 @@ export const data = new SlashCommandBuilder()
 
 export const execute = async (interaction: ChatInputCommandInteraction) => {
   try {
-    // Acknowledge the interaction immediately
     await interaction.deferReply({ ephemeral: true });
 
     const user = interaction.options.getUser('user');
@@ -67,7 +66,6 @@ export const execute = async (interaction: ChatInputCommandInteraction) => {
       return;
     }
 
-    // Attempt to mute the user
     await member.voice.setMute(true, 'Muted by bot command');
     await interaction.editReply({
       content: `${user.tag} has been muted successfully.`,
