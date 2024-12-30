@@ -16,7 +16,6 @@ export const execute = async (message: Message): Promise<void> => {
             return;
         }
 
-        // Read muteData.json
         if (!fs.existsSync(muteDataPath)) {
             await message.reply("Mute data file not found.");
             return;
@@ -26,12 +25,10 @@ export const execute = async (message: Message): Promise<void> => {
         
         let userIdToUnmute: string | null = null;
 
-        // Check if it's a reply
         if (message.reference?.messageId) {
             const referencedMessage = await message.channel.messages.fetch(message.reference.messageId);
             userIdToUnmute = referencedMessage.author.id;
         } else {
-            // Check for mention or ID in command arguments
             const args = message.content.split(' ').slice(1);
             if (args.length === 0) {
                 await message.reply("Please mention a user or provide their ID to unmute.");
@@ -47,7 +44,6 @@ export const execute = async (message: Message): Promise<void> => {
             return;
         }
 
-        // Find the user in muteData
         const muteEntry = muteData.find((entry: any) => entry.guildId === message.guild?.id && entry.userId === userIdToUnmute);
 
         if (!muteEntry) {
@@ -63,16 +59,13 @@ export const execute = async (message: Message): Promise<void> => {
             return;
         }
 
-        // Check if the user has the mute role
         if (!member.roles.cache.has(roleId)) {
             await message.reply("The user does not have the mute role.");
             return;
         }
 
-        // Remove the mute role
         await member.roles.remove(roleId);
 
-        // Update muteData.json
         muteEntry.expired = true;
         fs.writeFileSync(muteDataPath, JSON.stringify(muteData, null, 2));
 
