@@ -16,13 +16,12 @@ module.exports = {
   async execute(client: Client) {
     console.log('[Event Handler] voiceStateUpdateAndInteraction loaded.');
 
-    // A map to store collectors for each user
     const collectors = new Map<string, any>();
 
     client.on('voiceStateUpdate', async (oldState: VoiceState, newState: VoiceState) => {
       try {
         if (oldState.serverMute === newState.serverMute) {
-          return; // Skip if the mute state hasn't changed
+          return; 
         }
 
         if (!oldState.serverMute && newState.serverMute) {
@@ -132,7 +131,6 @@ module.exports = {
               time: 60000,
             });
 
-            // Store the collector in the map
             collectors.set(mutedBy.id, collector);
 
             let confirmed = false;
@@ -153,7 +151,6 @@ module.exports = {
                 if (message.deletable) {
                   await message.delete();
                 }
-                // Clean up the collector from the map
                 collectors.delete(mutedBy.id);
               } catch (error) {
                 console.error('Error deleting the message after collector end:', error);
