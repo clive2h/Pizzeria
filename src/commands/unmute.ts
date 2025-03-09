@@ -1,30 +1,17 @@
-import {
-    Message,
-    GuildMemberRoleManager,
-    PermissionFlagsBits
-} from "discord.js";
-import fs from 'fs';
-import path from "path";
+import { Message, PermissionFlagsBits } from "discord.js";
+import { MuteData, GuildsData } from "../database";
 
 export const name = "unmute";
 
 export const execute = async (message: Message): Promise<void> => {
     try {
-        const muteDataPath = path.resolve(__dirname, "../muteData.json");
-
         if (!message.member?.permissions.has(PermissionFlagsBits.MuteMembers)) {
             return;
         }
 
-        if (!fs.existsSync(muteDataPath)) {
-            await message.reply("Mute data file not found.");
-            return;
-        }
-
-        const muteData = JSON.parse(fs.readFileSync(muteDataPath, 'utf8'));
-        
         let userIdToUnmute: string | null = null;
 
+        // Check if it's a reply
         if (message.reference?.messageId) {
             const referencedMessage = await message.channel.messages.fetch(message.reference.messageId);
             userIdToUnmute = referencedMessage.author.id;
@@ -34,9 +21,7 @@ export const execute = async (message: Message): Promise<void> => {
                 await message.reply("Please mention a user or provide their ID to unmute.");
                 return;
             }
-
-            const mentionOrId = args[0].replace(/[<@!>]/g, '');
-            userIdToUnmute = mentionOrId;
+            userIdToUnmute = args[0].replace(/[<@!>]/g, '');
         }
 
         if (!userIdToUnmute) {
@@ -44,14 +29,18 @@ export const execute = async (message: Message): Promise<void> => {
             return;
         }
 
-        const muteEntry = muteData.find((entry: any) => entry.guildId === message.guild?.id && entry.userId === userIdToUnmute);
+        // Find the user in the database
+        const muteEntry = await GuildsData.findOne({
+            where: {
+                guildId: message.guild?.id,
+            }
+        });
 
         if (!muteEntry) {
             await message.reply("The specified user is not muted.");
             return;
         }
 
-        const roleId = muteEntry.roleId;
         const member = await message.guild?.members.fetch(userIdToUnmute);
 
         if (!member) {
@@ -59,15 +48,26 @@ export const execute = async (message: Message): Promise<void> => {
             return;
         }
 
-        if (!member.roles.cache.has(roleId)) {
+        if (!member.roles.cache.has(muteEntry.muteRoleId)) {
             await message.reply("The user does not have the mute role.");
             return;
         }
 
-        await member.roles.remove(roleId);
+        // Remove the mute role
+        await member.roles.remove(muteEntry.muteRoleId);
 
-        muteEntry.expired = true;
-        fs.writeFileSync(muteDataPath, JSON.stringify(muteData, null, 2));
+        const muteLog = await MuteData.findOne({
+            where: {
+                guildId: message.guild?.id,
+                expired: false
+            }
+        });
+        
+        if (muteLog) {
+            await muteLog.update({ expired: true });
+        } else {
+            console.log('لم يتم العثور على سجل لكتم المستخدم.');
+        }
 
         await message.reply(`Successfully unmuted <@${userIdToUnmute}>.`);
     } catch (error) {

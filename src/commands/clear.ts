@@ -3,7 +3,7 @@ import { ChannelType, Message, PermissionFlagsBits } from "discord.js";
 export const name = 'clear';
 
 export const execute = async (message: Message) => {
-    const args = message.content.trim().split(/ +/).slice(1);
+    const args = message.content.trim().split(/ +/).slice(1); // Extract arguments after the command name
 
     if (!message.guild) {
         return message.reply({ content: '❌ This command can only be used in a server.' });
@@ -14,15 +14,15 @@ export const execute = async (message: Message) => {
     }
 
     if (
-        message.channel.type !== ChannelType.GuildText && 
-        message.channel.type !== ChannelType.GuildVoice &&
-        message.channel.type !== ChannelType.GuildAnnouncement && 
-        message.channel.type !== ChannelType.PublicThread && 
-        message.channel.type !== ChannelType.PrivateThread && 
-        message.channel.type !== ChannelType.AnnouncementThread 
-    ) {
+        message.channel.type !== ChannelType.GuildText && // Standard text channel
+        message.channel.type !== ChannelType.GuildVoice && // Voice text channel
+        message.channel.type !== ChannelType.GuildAnnouncement && // Announcement channel
+        message.channel.type !== ChannelType.PublicThread && // Public thread
+        message.channel.type !== ChannelType.PrivateThread && // Private thread
+        message.channel.type !== ChannelType.AnnouncementThread // Announcement thread
+      ) {
         return message.reply({ content: '❌ This command can only be used in text-compatible channels.' });
-    }
+      }
 
     let amount = parseInt(args[0], 10);
 
@@ -35,6 +35,7 @@ export const execute = async (message: Message) => {
     }
 
     try {
+        // Bulk delete messages
         const deletedMessages = await message.channel.bulkDelete(amount, true);
         const confirmation = await message.channel.send({ content: `✅ Deleted ${deletedMessages.size} messages!` });
 
