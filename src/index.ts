@@ -1,10 +1,10 @@
 import { Client, GatewayIntentBits,Partials } from 'discord.js';
 import { loadCommands } from './handler/handler';
-import { registerSlashCommands } from './handler/registerSlashCommands';
-import { loadSlashCommands } from './handler/slashHandler';
-import { connectToMongoDB } from './mongo/mongodb';
 import { loadEvents } from './handler/events';
+const event = require('./events/voicemuteEvent');
+
 import 'dotenv/config';
+import { initializeDatabase } from './database';
 
 export const client = new Client({
   intents: [
@@ -29,17 +29,19 @@ export const client = new Client({
     GatewayIntentBits.GuildPresences,
     GatewayIntentBits.GuildWebhooks,
   ],
-  partials: [Partials.Channel]
+  partials: [Partials.Channel] // Needed to handle partial DM channels
 });
 
-const event = require('./events/voicemuteEvent');
 event.execute(client);
 
-loadCommands(client);
-loadEvents(client);
+initializeDatabase(client).then(async () => {
+  loadCommands(client);
+  loadEvents(client);
+  client.login(process.env.TOKEN);
+  
+  // Initialize music clients
 
-
-connectToMongoDB()
-  .catch((err) => console.error('Failed to connect to MongoDB:', err));
-
-client.login(process.env.TOKEN);
+}).catch(error => {
+  console.error('Failed to initialize database:', error);
+  process.exit(1);
+});
